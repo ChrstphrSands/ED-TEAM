@@ -4,17 +4,24 @@ import PostCard from './PostCard';
 import { PostContext } from "../AppContext";
 import PostForm from "./PostForm";
 
+import reducer from '../store/reducers';
+
+import * as Actions from '../store/actions';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import withReducer from '../store/withReducer';
+
 function PostsGrid() {
   const { updateRequests } = useContext(PostContext);
   const { isOpenDialog, setIsOpenDialog } = useContext(PostContext);
-  const [posts, setPosts] = useState([]);
+  // const [posts, setPosts] = useState([]);
+
+  const dispatch = useDispatch();
+  const posts = useSelector(({ postsData }) => postsData.posts.posts)
 
   const getPosts = () => {
-    axios.get('https://jsonplaceholder.typicode.com/posts')
-      .then((response) => {
-        setPosts(response.data);
-        updateRequests('GET_ALL')
-      })
+    dispatch(Actions.getPosts())
   }
 
   useEffect(() => {
@@ -47,4 +54,4 @@ function PostsGrid() {
   )
 }
 
-export default PostsGrid;
+export default withReducer('postsData', reducer)(PostsGrid)
