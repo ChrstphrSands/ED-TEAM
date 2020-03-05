@@ -5,14 +5,15 @@ import { PostContext } from "../AppContext";
 import PostForm from "./PostForm";
 
 function PostsGrid() {
-  const {isOpenDialog, setIsOpenDialog} = useContext(PostContext);
-
+  const { updateRequests } = useContext(PostContext);
+  const { isOpenDialog, setIsOpenDialog } = useContext(PostContext);
   const [posts, setPosts] = useState([]);
 
   const getPosts = () => {
     axios.get('https://jsonplaceholder.typicode.com/posts')
       .then((response) => {
         setPosts(response.data);
+        updateRequests('GET_ALL')
       })
   }
 
@@ -35,11 +36,11 @@ function PostsGrid() {
       </div>
 
       {posts.map(post => (
-        <PostCard post={post}/>)
+        <PostCard key={post.id} post={post} />)
       )}
 
       {isOpenDialog && (
-        <PostForm data={null}/>
+        <PostForm data={null} />
       )}
 
     </>

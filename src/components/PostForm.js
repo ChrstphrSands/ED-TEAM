@@ -1,10 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { PostContext } from "../AppContext";
+import { useForm } from '../hooks/useForm';
 
-function PostForm({data}) {
+import { validacion } from '../utils/validacion'
 
-  const {isOpenDialog, setIsOpenDialog, updateRequests} = useContext(PostContext);
+function PostForm({ data }) {
+
+  const { isOpenDialog, setIsOpenDialog, updateRequests } = useContext(PostContext);
+
+  const {
+    errors, handleChange, handleSubmit, setValues, values
+  } = useForm(
+    () => handleClickSave(),
+    {},
+    validacion
+  );
 
   const [post, setPost] = useState({
     title: '',
@@ -12,20 +23,15 @@ function PostForm({data}) {
     userId: 5
   });
 
-  const handleChange = (event) => {
-    const {name, value} = event.target;
-    setPost({...post, [name]: value})
-  }
-
   const handleClickSave = () => {
-    data !== null ? updatePost() : savePost()
+    return data !== null ? updatePost() : savePost()
   }
 
   useEffect(() => {
     if (data !== null) {
       setPost(data);
     }
-  }, []);
+  }, [data]);
 
   const savePost = () => {
     axios.post('https://jsonplaceholder.typicode.com/posts', {
@@ -48,7 +54,7 @@ function PostForm({data}) {
         setIsOpenDialog(false);
         updateRequests('PUT')
       }
-      })
+    })
   }
 
   return (
@@ -68,25 +74,26 @@ function PostForm({data}) {
                 className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                 onClick={() => setIsOpenDialog(false)}
               >
-                    <span
-                      className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                      ×
+                <span
+                  className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                  ×
                     </span>
               </button>
             </div>
             <div className="relative p-6 flex-auto">
               <div
                 className="relative flex w-full flex-wrap items-stretch mb-8">
-                <input type="text" placeholder="Title"
-                       name='title'
-                       value={post.title}
-                       onChange={handleChange}
-                       className="px-2 py-1 placeholder-gray-400 mb-8 text-gray-700 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"/>
-                <input type="text" placeholder="Body"
-                       onChange={handleChange}
-                       name='body'
-                       value={post.body}
-                       className="px-2 py-1 placeholder-gray-400 text-gray-700 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"/>
+                <input type="text" placeholder={errors.title ? 'Debe ingresar el título.' : 'Título'}
+                  name='title'
+                  value={values.title}
+                  onChange={handleChange}
+                  className={errors.title ? 'placeholder-red-400 border-solid border-red-300' : "px-2 py-1 placeholder-gray-400 mb-8 text-gray-700 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"} />
+                <input type="text"
+                  placeholder={errors.body ? 'Debe ingresar el cuerpo.' : 'Cuerpo'}
+                  onChange={handleChange}
+                  name='body'
+                  value={values.body}
+                  className={errors.body ? 'placeholder-red-400 border-solid border-red-300 px' : "px-2 py-1 placeholder-gray-400 text-gray-700 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"} />
               </div>
             </div>
             <div
@@ -94,7 +101,7 @@ function PostForm({data}) {
               <button
                 className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"
                 type="button"
-                style={{transition: "all .15s ease"}}
+                style={{ transition: "all .15s ease" }}
                 onClick={() => setIsOpenDialog(false)}
               >
                 Cerrar
@@ -102,8 +109,8 @@ function PostForm({data}) {
               <button
                 className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                 type="button"
-                style={{transition: "all .15s ease"}}
-                onClick={handleClickSave}
+                style={{ transition: "all .15s ease" }}
+                onClick={handleSubmit}
               >
                 Guardar
               </button>

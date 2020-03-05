@@ -3,8 +3,9 @@ import axios from 'axios';
 import { PostContext } from "../AppContext";
 import PostForm from "./PostForm";
 
-function PostDetail({match, history}) {
-  const {isOpenDialog, setIsOpenDialog} = useContext(PostContext);
+function PostDetail({ match, history }) {
+  const { updateRequests } = useContext(PostContext);
+  const { isOpenDialog, setIsOpenDialog } = useContext(PostContext);
 
   const [post, setPost] = useState({});
 
@@ -12,14 +13,17 @@ function PostDetail({match, history}) {
     axios.get(`https://jsonplaceholder.typicode.com/posts?id=${match.params.id}`)
       .then(response => {
         setPost(response.data[0]);
+        updateRequests('GET_ONE')
       })
   }
 
   const deletePost = () => {
     axios.delete(`https://jsonplaceholder.typicode.com/posts/${post.id}`)
       .then(response => {
-        console.log(response);
-        history.push('/');
+        if (response.status === 200) {
+          history.push('/');
+          updateRequests('DELETE')
+        }
       })
   }
 
@@ -62,13 +66,13 @@ function PostDetail({match, history}) {
               </div>
             </>
           ) : (
-            <h1>ERROR</h1>
-          )
+              <h1>ERROR</h1>
+            )
           }
         </div>
       </div>
       {isOpenDialog && (
-        <PostForm data={post}/>
+        <PostForm data={post} />
       )}
     </>
 

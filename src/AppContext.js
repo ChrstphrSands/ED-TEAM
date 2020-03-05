@@ -1,4 +1,4 @@
-import React, { createContext, useState} from 'react'
+import React, { createContext, useState } from 'react'
 
 export const PostContext = createContext({});
 
@@ -8,7 +8,7 @@ const PostContextProvider = ({ children }) => {
   const updateRequests = (method) => {
     const data = localStorage.getItem(method);
     if (data === null) {
-      localStorage.setItem(method, '0');
+      localStorage.setItem(method, '1');
     } else {
       let requests = Number.parseInt(data);
       requests++;
